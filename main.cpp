@@ -7,6 +7,8 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
 
+using namespace std;
+
 
 const int WIDTH = 800, HEIGHT = 800, GRID = 8;
 
@@ -17,10 +19,15 @@ int playerY =20;
 
 float speed=8;
 
+char characters [86] = " ?!@#$%^&*();:',.@_0123456789abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+
+
 SDL_Window *window ;
 SDL_Renderer *renderer; 
 SDL_Texture *texture;
 SDL_Texture *textu;
+
+SDL_Surface* surfFont;
 SDL_Texture* textFont;
 
 
@@ -47,13 +54,16 @@ void renderSprite(int x, int y, int h, int w, int xi, int yi, int grid);
 
 void animatedSpritePlayer();
 void renderText(int x, int y, int h, int w);
+void texto(char * str);
 
 void draw(){
     //Color de fondo
     SDL_SetRenderDrawColor(renderer, 210, 250, 210,255);
     SDL_RenderClear(renderer);
     //SDL_SetRenderDrawColor(renderer,0,0,255,255);
-
+    //std::string str("GeeksforGeeks");
+    char tt[]="holaww";
+    texto(tt);
     renderText(10, 10, 200, 200);
 
 
@@ -89,7 +99,7 @@ void imguiDraw(){
     ImGui::NewFrame();   
     
     if (show_demo_window){
-            ImGui::ShowDemoWindow(&show_demo_window);
+            //
     
             static float f = 0.0f;
             static int counter = 0;
@@ -121,13 +131,8 @@ void imguiDraw(){
     }
         // 3. Show another simple window.
         if (show_another_window)
-        {
-            printf("show_another_window");
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
+        {            
+            ImGui::ShowDemoWindow(&show_another_window);
         }
 
 
@@ -175,8 +180,13 @@ void renderSprite(int x, int y, int h, int w, int xi, int yi, int grid){
         SDL_RenderCopy(renderer, textu, &rectanculo,&rectDest);
 }
 
+void texto(char * str){
+    surfFont = TTF_RenderText_Solid(gFont, str,{ 0, 0, 0 }); 
+    textFont = SDL_CreateTextureFromSurface(renderer, surfFont);
+}
+
 int main(int argc, char ** arg){ 
-    std::cout << "Hello world";
+    //std::cout << "Hello world";
     if(SDL_Init(SDL_INIT_VIDEO)!=0){
         fprintf(stderr, "FALLA");
         printf("ERROR INICIAR %s\n",SDL_GetError() );
@@ -206,14 +216,15 @@ int main(int argc, char ** arg){
     #endif
 
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    windowUI = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
-    rendererUI = SDL_CreateRenderer(windowUI, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+    //windowUI = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    //rendererUI = SDL_CreateRenderer(windowUI, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     
-    if (rendererUI == nullptr)
+   /* if (rendererUI == nullptr)
     {
         SDL_Log("Error creating SDL_Renderer!");
         return 0;
     }
+    */
 
     if( TTF_Init() == -1 )
     {
@@ -228,8 +239,7 @@ int main(int argc, char ** arg){
         return 0;
     }
     
-    SDL_Surface* surfFont = TTF_RenderText_Solid(gFont, "Hola",{ 0, 0, 0 }); 
-    textFont = SDL_CreateTextureFromSurface(renderer, surfFont);
+ 
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -242,8 +252,8 @@ int main(int argc, char ** arg){
     //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer(windowUI, rendererUI);
-    ImGui_ImplSDLRenderer2_Init(rendererUI);
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer2_Init(renderer);
 
 
     //Cargar Sprite sheet
@@ -305,8 +315,8 @@ int main(int argc, char ** arg){
     ImGui_ImplSDL2_Shutdown();    
     ImGui::DestroyContext();
 
-    SDL_DestroyRenderer(rendererUI);
-    SDL_DestroyWindow(windowUI);    
+    //SDL_DestroyRenderer(rendererUI);
+    //SDL_DestroyWindow(windowUI);    
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 
